@@ -67,6 +67,38 @@ ngrok http http://127.0.0.1:5000
 Forwarding url will be displayed.
 Example: https://ed65-103-254-245-34.ngrok-free.app -> http://127.0.0.1:5000   
 
+## Prepare MongoDB Container
+
+* Pull the MongoDB Docker image
+```bash
+docker pull mongo
+```
+
+* Run MongoDB container
+
+```bash
+docker run -d --name my-mongo -p 27017:27017 -v mongodbdata:/data/db -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=Dhruv@1805 mongo
+```
+
+* verify it is running
+```bash
+docker ps
+```
+
+* Stop & remove container (if needed)
+```bash
+docker stop my-mongo
+docker rm my-mongo
+```
+
+## Download and configure MongoDB client
+
+* URL to Download MongoDB Compass
+https://www.mongodb.com/try/download/compass
+
+* Connecto MongoDB 
+mongodb://admin:Dhruv@1805@localhost:27017
+
 ## How to test?
 
 * Run app.py

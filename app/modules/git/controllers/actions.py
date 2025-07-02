@@ -1,4 +1,6 @@
 from flask import request, jsonify, json
+from datetime import datetime, timezone
+from app.modules.git.models import create
 
 #################################################################
 # Using three separate webhooks (push, pull, merge)
@@ -17,7 +19,7 @@ from flask import request, jsonify, json
 #        handle_merge()
 #################################################################
 
-# capture PULL action on rpository
+# capture PULL action on repository
 def pull():
     # Check Content-Type header 
     content_type = request.headers.get('Content-Type', '')
@@ -30,7 +32,19 @@ def pull():
     # Parse JSON body
     data = request.get_json()  # it is equivalent to request.json
 
+    doc = {
+        "request_id": str(data["pull_request"]["id"]),
+        "author": data["pull_request"]["user"]["login"],
+        "action": "PULL",  # or "PULL_REQUEST" based on your design
+        "from_branch": data["pull_request"]["head"]["ref"],
+        "to_branch": data["pull_request"]["base"]["ref"],
+        "timestamp": datetime.now(timezone.utc)
+    }
+
+    create(doc)
+
     # Dump to string for debugging / or return as response
+    # it is also available in sys log
     dump = json.dumps(data)
     print(dump)
 
@@ -48,6 +62,17 @@ def push():
 
     # Parse JSON body
     data = request.get_json()  # it is equivalent to request.json
+
+    doc = {
+        "request_id": str(data["head_commit"]["id"]),       # use commit SHA as request_id
+        "author": data["pusher"]["name"],                   # pusher name
+        "action": "PUSH",                                   # "PUSH" for push events
+        "from_branch": data["ref"].replace("refs/heads/", ""),  # remove 'refs/heads/' prefix
+        "to_branch": data["repository"]["default_branch"],  # usually "main" or "master"
+        "timestamp": datetime.now(timezone.utc)             # current UTC datetime
+    }
+
+    create(doc)
 
     # Dump to string for debugging / or return as response
     dump = json.dumps(data)
@@ -68,7 +93,16 @@ def Merge():
     # Parse JSON body
     data = request.get_json()  # it is equivalent to request.json
 
-    # Dump to string for debugging / or return as response
+    doc = {
+        "request_id": str(data["head_commit"]["id"]),           # use latest commit id as request_id
+        "author": data["pusher"]["name"],                       # name of the person who pushed / merged
+        "action": "MERGE",                                      # action type is MERGE
+        "from_branch": data["base_ref"].replace("refs/heads/", ""),  # source branch before merge
+        "to_branch": data["ref"].replace("refs/heads/", ""),    # target branch after merge
+        "timestamp": datetime.now(timezone.utc)
+    }
+    create(doc)
+    # Dump to string for debugging / or return as response  
     dump = json.dumps(data)
     print(dump)
 

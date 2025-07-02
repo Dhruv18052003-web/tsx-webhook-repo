@@ -32,7 +32,11 @@ class Config:
     # Running Environment
     RUN_ENV = env_name
 
-    #Storage
+    # MongoDB configuration
+    DB_CON_STR = os.getenv("DB_CON_STR")
+    DB_NAME = os.getenv("DB_NAME")
+    
+    # Storage
     BASE_DIR = BASE_DIR
     STORAGE_PATH = BASE_DIR / os.getenv("STORAGE_PATH")
     LOG_PATH = STORAGE_PATH / os.getenv("LOG_PATH")
