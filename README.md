@@ -96,7 +96,7 @@ docker rm my-mongo
 * URL to Download MongoDB Compass
 https://www.mongodb.com/try/download/compass
 
-* Connecto MongoDB 
+* Connec to MongoDB 
 mongodb://admin:Dhruv@1805@localhost:27017
 
 ## How to test?

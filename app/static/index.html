@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Actions Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .action-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        .highlight {
+            color: #007bff;
+            font-weight: bold;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Git Actions Dashboard</h1>
+        <div id="content">
+            <div class="loading">Loading git actions...</div>
+        </div>
+    </div>
+
+    <script>
+        function highlightQuotedText(text) {
+            return text.replace(/'([^']+)'/g, '<span class="highlight">\'$1\'</span>');
+        }
+
+        async function loadGitActions() {
+            try {
+                const response = await fetch('http://localhost:5000/v1/git/list');
+                const data = await response.json();
+                
+                const contentDiv = document.getElementById('content');
+                
+                if (data.actions && data.actions.length > 0) {
+                    const actionsHtml = data.actions.map(action => 
+                        `<div class="action-item">${highlightQuotedText(action)}</div>`
+                    ).join('');
+                    
+                    contentDiv.innerHTML = actionsHtml;
+                } else {
+                    contentDiv.innerHTML = '<div class="action-item">No git actions found.</div>';
+                }
+            } catch (error) {
+                document.getElementById('content').innerHTML = 
+                    `<div class="error">Error loading git actions: ${error.message}</div>`;
+            }
+        }
+
+        // Load actions when page loads
+        window.addEventListener('load', loadGitActions);
+    </script>
+</body>
+</html>

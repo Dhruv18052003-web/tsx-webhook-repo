@@ -40,4 +40,10 @@ def register_all_routes(app):
     def merge():
         return git_controller.merge()
     
+
+    # get latest actions on repository
+    @git_routes.route('/list', methods=['GET'])
+    def list():
+        return git_controller.list()
+    
     app.register_blueprint(git_routes)

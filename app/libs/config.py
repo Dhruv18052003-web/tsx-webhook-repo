@@ -7,6 +7,7 @@ Located at: dev.env
 from pathlib import Path
 import os
 import sys
+from urllib.parse import quote_plus
 
 # Lib to load the env variables from dev.env  
 from dotenv import load_dotenv
@@ -33,7 +34,13 @@ class Config:
     RUN_ENV = env_name
 
     # MongoDB configuration
-    DB_CON_STR = os.getenv("DB_CON_STR")
+    DB_PROTOCOL=os.getenv("DB_PROTOCOL")
+    DB_HOST=os.getenv("DB_HOST")
+    DB_PORT=os.getenv("DB_PORT")
+    DB_USERNAME=quote_plus(os.getenv("DB_USERNAME") or "")
+    DB_PASSWORD=quote_plus(os.getenv("DB_PASSWORD") or "")
+
+    DB_CON_STR = f"{DB_PROTOCOL}://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}"
     DB_NAME = os.getenv("DB_NAME")
     
     # Storage

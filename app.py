@@ -4,8 +4,8 @@ from app.libs.config import Config
 from app.libs.logger import Logging
 from loguru import logger
 
-# create Flask application
-app = Flask(__name__)
+# create Flask application with static folder configuration
+app = Flask(__name__, static_folder='app/static', static_url_path='/static')
 
 # add all routes 
 register_all_routes(app)
