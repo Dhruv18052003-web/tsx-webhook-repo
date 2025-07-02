@@ -120,9 +120,24 @@ https://ed65-103-254-245-34.ngrok-free.app/v1/sys/echo?fname=Dhruv&lname=Joshi
 it shows:
 {"fname":"Dhruv","lname":"Joshi"}
 
+* check list - latest actions on repository
 
+https://ed65-103-254-245-34.ngrok-free.app/v1/git/list
 
+it shows:
+{
+    "actions": [
+        "'Dhruv18052003-web' pushed to 'main' on 02 July 2025 - 03:29 PM UTC",
+        "'Dhruv18052003-web' pushed to 'main' on 02 July 2025 - 03:26 PM UTC",
+        "'Dhruv18052003-web' merged from 'umang' to 'main' on 02 July 2025 - 02:39 PM UTC",
+        "'Dhruv18052003-web' submitted a pull request from 'dhruv' to 'main' on 02 July 2025 - 02:35 PM UTC",
+        "'Dhruv18052003-web' pushed to 'main' on 02 July 2025 - 02:31 PM UTC"
+    ]
+}
 
+* You can use static page to check latest entries 
 
+Visit below URL in wb browser
+https://ed65-103-254-245-34.ngrok-free.app/static/index.html
 
 *******************
