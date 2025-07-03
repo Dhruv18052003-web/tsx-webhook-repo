@@ -18,9 +18,6 @@ def create(doc: dict) -> ObjectId:
 
     return result.inserted_id
 
-
-from datetime import datetime
-
 def latest(limit: int) -> list:
     # Connect to MongoDB
     client = MongoClient(Config.DB_CON_STR)

@@ -62,10 +62,12 @@ ngrok config add-authtoken 2zIzqFdJBDNAqe0PJUnvzaIWTFD_691tUj7pwoMhSSL6s2x9Q
 *Step 3: Deploy your app online:
 
 ```bash
-ngrok http http://127.0.0.1:5000
+.\ngrok http http://127.0.0.1:5000
 ```
-Forwarding url will be displayed.
-Example: https://ed65-103-254-245-34.ngrok-free.app -> http://127.0.0.1:5000   
+Forwarding url will be displayed like below
+Example: https://ed65-103-254-245-34.ngrok-free.app -> http://127.0.0.1:5000  
+
+* use this url pefix to set up the webhook on github
 
 ## Prepare MongoDB Container
 

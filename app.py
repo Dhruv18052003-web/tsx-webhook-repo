@@ -16,6 +16,7 @@ app.config.from_object(Config)
 # Set up logging
 Logging.configure_logging()
 
+# this line of code records api call with request payload to sys.log file
 @app.before_request
 def log_request():
     logger.bind(system=True).info(
