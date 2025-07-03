@@ -1,145 +1,226 @@
-# tsx-webhook-repo
+# GitHub Webhook Receiver
 
-# Dev Assessment - Webhook Receiver
+A Flask-based webhook receiver that captures GitHub repository events (Push, Pull Request, Merge) and stores them in MongoDB.
 
-Please use this repository for constructing the Flask webhook receiver.
+## Overview
 
-*******************
+This application provides a webhook endpoint that receives GitHub events and stores them in a MongoDB database. It supports three main GitHub actions:
+- **Push**: Code pushed to repository
+- **Pull Request**: New pull request submitted
+- **Merge**: Pull request merged
 
-## Setup
+## Architecture
 
-* Create a new virtual environment
-
-```bash
-pip install virtualenv
+```
+├── app/
+│   ├── libs/           # Core libraries
+│   ├── modules/        # Feature modules
+│   └── static/         # Static files
+├── docs/              # Documentation
+└── requirements.txt   # Dependencies
 ```
 
-* Create the virtual env
+## Features
 
+- **Webhook Processing**: Handles GitHub webhook events
+- **MongoDB Integration**: Stores events in MongoDB database
+- **Logging System**: Comprehensive logging with Loguru
+- **Environment Configuration**: Environment-based configuration
+- **Static Dashboard**: Web interface to view recent actions
+
+## Quick Start
+
+### Prerequisites
+- Python 3.8+
+- MongoDB (Docker recommended)
+- ngrok (for webhook testing)
+
+### Installation
+
+1. **Clone and setup virtual environment**:
 ```bash
-virtualenv venv
+git clone <repository-url>
+cd tsk-public-assignment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-* Activate the virtual env
-
-```bash
-source venv/bin/activate
-```
-
-* Install requirements
-
+2. **Install dependencies**:
 ```bash
 pip install -r requirements.txt
 ```
 
-* Run the flask application (In production, please use Gunicorn)
-
-```bash
-python run.py
-```
-
-* The endpoint is at:
-
-```bash
-POST http://127.0.0.1:5000/webhook/receiver
-```
-
-You need to use this as the base and setup the flask app. Integrate this with MongoDB (commented at `app/extensions.py`)
-
-
-## Setup ngrok
-
-
-* Step 1: Download ngrok for windows (64 bit)
-    https://dashboard.ngrok.com/get-started/setup/windows
-
-* Step 2: Sign up and get the token generated.
-
-```bash
-ngrok config add-authtoken 2zIzqFdJBDNAqe0PJUnvzaIWTFD_691tUj7pwoMhSSL6s2x9Q
-```
-
-*Step 3: Deploy your app online:
-
-```bash
-.\ngrok http http://127.0.0.1:5000
-```
-Forwarding url will be displayed like below
-Example: https://ed65-103-254-245-34.ngrok-free.app -> http://127.0.0.1:5000  
-
-* use this url pefix to set up the webhook on github
-
-## Prepare MongoDB Container
-
-* Pull the MongoDB Docker image
+3. **Setup MongoDB**:
 ```bash
 docker pull mongo
+docker run -d --name my-mongo -p 27017:27017 \
+  -v mongodbdata:/data/db \
+  -e MONGO_INITDB_ROOT_USERNAME=admin \
+  -e MONGO_INITDB_ROOT_PASSWORD=Dhruv@1805 mongo
 ```
 
-* Run MongoDB container
+4. **Configure environment**:
+   - Copy `dev.env` and update MongoDB credentials if needed
+   - Default configuration connects to local MongoDB
 
-```bash
-docker run -d --name my-mongo -p 27017:27017 -v mongodbdata:/data/db -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=Dhruv@1805 mongo
-```
-
-* verify it is running
-```bash
-docker ps
-```
-
-* Stop & remove container (if needed)
-```bash
-docker stop my-mongo
-docker rm my-mongo
-```
-
-## Download and configure MongoDB client
-
-* URL to Download MongoDB Compass
-https://www.mongodb.com/try/download/compass
-
-* Connec to MongoDB 
-mongodb://admin:Dhruv@1805@localhost:27017
-
-## How to test?
-
-* Run app.py
-
+5. **Run application**:
 ```bash
 python app.py
 ```
 
-* check root: Open web browser & type following url
-https://ed65-103-254-245-34.ngrok-free.app
+### Setup GitHub Webhook
 
-it shows following message
-welcome buddy
+1. **Expose local server**:
+```bash
+ngrok http 5000
+```
 
-* check echo: open web browser & trype following url
+2. **Configure GitHub webhook**:
+   - Go to your GitHub repository → Settings → Webhooks
+   - Add webhook URL: `https://your-ngrok-url.ngrok.io/v1/git/[action]`
+   - Set content type: `application/json`
+   - Select events: Push, Pull, Merge requests
 
-https://ed65-103-254-245-34.ngrok-free.app/v1/sys/echo?fname=Dhruv&lname=Joshi
+## API Endpoints
 
-it shows:
-{"fname":"Dhruv","lname":"Joshi"}
+### System Endpoints
+- `GET /` - Welcome message
+- `GET /v1/sys/echo` - Echo query parameters
 
-* check list - latest actions on repository
+### Git Webhook Endpoints
+- `POST /v1/git/push` - Receive push events
+- `POST /v1/git/pull` - Receive pull request events  
+- `POST /v1/git/merge` - Receive merge events
+- `GET /v1/git/list` - List recent actions
 
-https://ed65-103-254-245-34.ngrok-free.app/v1/git/list
+### Static Files
+- `GET /static/index.html` - Dashboard to view recent actions
 
-it shows:
+## Configuration
+
+Environment variables in `dev.env`:
+
+```env
+# MongoDB
+DB_PROTOCOL=mongodb
+DB_HOST=localhost
+DB_PORT=27017
+DB_USERNAME=admin
+DB_PASSWORD=Dhruv@1805
+DB_NAME=techstax
+
+# Logging
+STORAGE_PATH=../storage
+LOG_PATH=logs
+APP_LOG_PATH=app
+SYS_LOG_PATH=sys
+```
+
+## Database Schema
+
+**Collection**: `git_action_logs`
+
+```json
 {
-    "actions": [
-        "'Dhruv18052003-web' pushed to 'main' on 02 July 2025 - 03:29 PM UTC",
-        "'Dhruv18052003-web' pushed to 'main' on 02 July 2025 - 03:26 PM UTC",
-        "'Dhruv18052003-web' merged from 'umang' to 'main' on 02 July 2025 - 02:39 PM UTC",
-        "'Dhruv18052003-web' submitted a pull request from 'dhruv' to 'main' on 02 July 2025 - 02:35 PM UTC",
-        "'Dhruv18052003-web' pushed to 'main' on 02 July 2025 - 02:31 PM UTC"
-    ]
+  "_id": "ObjectId",
+  "request_id": "string",
+  "author": "string", 
+  "action": "PUSH|PULL|MERGE",
+  "from_branch": "string",
+  "to_branch": "string",
+  "timestamp": "datetime"
 }
+```
 
-* You can use static page to check latest entries 
+## Logging
 
-Visit below URL in wb browser
-https://ed65-103-254-245-34.ngrok-free.app/static/index.html
+The application uses Loguru for structured logging:
 
-*******************
+- **App Logs**: `../storage/logs/app/`
+  - `debug.log` - Debug information
+  - `info.log` - General information
+  - `error.log` - Error messages
+
+- **System Logs**: `../storage/logs/sys/`
+  - `sys.log` - Request/response logs
+
+## Testing
+
+### Manual Testing
+
+1. **Test system endpoints**:
+```bash
+curl http://localhost:5000/
+curl "http://localhost:5000/v1/sys/echo?fname=John&lname=Doe"
+```
+
+2. **Test webhook simulation**:
+```bash
+curl -X POST http://localhost:5000/v1/git/push \
+  -H "Content-Type: application/json" \
+  -d '{"head_commit":{"id":"abc123"},"pusher":{"name":"testuser"},"ref":"refs/heads/main","repository":{"default_branch":"main"}}'
+```
+
+3. **View recent actions**:
+```bash
+curl http://localhost:5000/v1/git/list
+```
+
+### Web Dashboard
+
+Visit `http://localhost:5000/static/index.html` to view recent repository actions in a web interface.
+
+## Deployment
+
+### Production Considerations
+
+1. **Use Gunicorn**:
+```bash
+pip install gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+2. **Environment Security**:
+   - Use production MongoDB credentials
+   - Set secure environment variables
+   - Enable HTTPS for webhook endpoints
+
+3. **MongoDB Security**:
+   - Use authentication
+   - Configure network access
+   - Regular backups
+
+## Troubleshooting
+
+### Common Issues
+
+1. **MongoDB Connection Failed**:
+   - Verify MongoDB is running: `docker ps`
+   - Check credentials in `dev.env`
+   - Ensure port 27017 is accessible
+
+2. **Webhook Not Receiving Events**:
+   - Verify ngrok is running and URL is correct
+   - Check GitHub webhook configuration
+   - Review webhook delivery logs in GitHub
+
+3. **Import Errors**:
+   - Ensure virtual environment is activated
+   - Install all requirements: `pip install -r requirements.txt`
+
+### Logs Location
+
+Check application logs in:
+- `../storage/logs/app/` - Application logs
+- `../storage/logs/sys/` - System/request logs
+
+## Contributing
+
+1. Follow existing code structure
+2. Add appropriate logging
+3. Update documentation for new features
+4. Test webhook endpoints thoroughly
+
+## License
+
+This project is part of a technical assessment for TechStaX.
